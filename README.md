@@ -30,8 +30,9 @@ The primary objective of this library is to **simulate and visualize** how diffe
 
 | Variable | Description |
 | :--- | :--- |
-| **$E$ (Estate)** | Total amount to be distributed. In the simulation, this defines the "resource constraint". |
 | **$N$ (Agents)** | Number of participants competing for the estate. |
+| **`AVG_CLAIM`** | The average claim cap for each agent. |
+| **$E$ (Estate)** | Total amount to be distributed. In the default configuration, this is dynamically simulated as $N \times AVG\_CLAIM$. This acts as the "resource constraint." |
 | **Claims ($c_i$)** | The demand made by each agent. The simulation iterates through combinations where $c_i \in [1, E]$. |
 | **`theta_steps`** | Determines the granularity of the $\theta$-Talmud rules simulation. It defines how many discrete $\theta$ values are tested between 0 (CEL) and 1 (CEA). |
 
@@ -63,11 +64,12 @@ For $N = 3$, this plot maps the marginal gradient of Agent 1 against the claims 
 *   **Why Bars?**: Bankruptcy rules operate on discrete claims. Bar plots emphasize that these are not continuous functions, but step-wise allocations.
 *   **Color Coding**: Uses a `RdYlGn` colormap, where Green (1.0) indicates a full marginal gain and Red (0.0) indicates zero marginal gain for an extra unit of claim.
 
-### 4. Aggregated Gradient Heatmap (N > 3)
-For larger groups of agents, we plot a suite of 4 heatmaps (Average, Median, Max, Min):
-*   **X-axis**: $C_{-1}$ (the sum of claims of all agents *except* agent 1).
-*   **Y-axis**: $c_1$ (agent 1's claim).
-*   **Insight**: This allows us to see how agent 1's marginal gain fluctuates depending on the "total competition" from others, even when individual combinations are too numerous to plot.
+### 4. Aggregated Gradient Heatmap (N >= 4)
+For larger groups of agents, we generate a consolidated multi-rule heatmap:
+*   **X-axis**: $c_1$ (Agent 1's claim).
+*   **Y-axis**: $C$ (The total sum of all agents' claims).
+*   **Color Coding**: Displays the Average Marginal Gradient ($\Delta x_1$) for that point.
+*   **Insight**: This allows us to map Agent 1's absolute claim against the macroeconomic state of the total estate debt ($C$), reducing high-dimensional configurations into clean, digestible heat constraints.
 
 ---
 

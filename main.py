@@ -39,7 +39,8 @@ def simulate_bankruptcy(N, E, rule_func):
 if __name__ == "__main__":
     # parameters
     N = 3
-    E = 20
+    AVG_CLAIM = 10
+    E = N * AVG_CLAIM
     theta_steps = 4
     
     # We load the rules implemented
