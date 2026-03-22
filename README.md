@@ -106,6 +106,5 @@ You can still modify the rules instantiated inside `rules_to_plot` directly in `
 *   **Caching**: The `cache.py` module handles sum calculations for claim combinations, which significantly speeds up simulations with many agents ($N > 10$).
 *   **Extensibility**: To add a new rule, simply define a function `my_rule(E, claims)` in `rules.py` and add it to the `rules_to_plot` list in `main.py`.
 *   **Mathematical Fact**: For the Talmud rule ($N=2$), you will notice a distinct "kink" at $\sum c_i = 2E$, representing the transition between equal awards and equal losses.
-
 ---
 *Created with ❤️ for Game Theorists and Economic Data Scientists.*
