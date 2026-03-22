@@ -2,13 +2,21 @@ import itertools
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 import numpy as np
+import argparse
+import math
 import typing
 from collections import defaultdict
 from cache import get_claims_sum
 
 
 def parse_arguments():
-    import argparse
+    """
+    Parses command-line arguments to configure the simulation.
+    Returns:
+        N: Number of agents
+        E: Total estate to distribute
+        theta_steps: Granularity parameter for theta-Talmud rules
+    """
     parser = argparse.ArgumentParser(description="Bankruptcy Rules Simulation")
     parser.add_argument("-N", type=int, default=None, help="Number of agents (N)")
     parser.add_argument("-E", type=int, default=None, help="Total estate to distribute (E). Defaults to N * AVG_CLAIM if not set.")
@@ -36,7 +44,6 @@ def plot_allocations(N, E, rules_list, simulate_func):
         print("Error: Allocation surface plotting is only supported for N >= 2.")
         return
 
-    import math
     num_rules = len(rules_list)
     
     if num_rules <= 3:
@@ -266,7 +273,6 @@ def plot_gradients_bar3d(N, E, rules_list, simulate_func):
     for idx, rule_func in enumerate(rules_list):
         ax = fig.add_subplot(rows, cols, idx + 1, projection='3d')
             
-        import typing
         results = simulate_func(N, E, rule_func)
         grad_map: typing.DefaultDict[typing.Tuple[int, int], typing.List[float]] = defaultdict(list) # type: ignore
         
@@ -324,11 +330,6 @@ def plot_gradients_aggregated_heatmap(N, E, rules_list, simulate_func):
     Y-axis: Sum of all claims (C)
     Color: Avg Marginal Gradient (Delta x_1)
     """
-    import math
-    from collections import defaultdict
-    import typing
-    import numpy as np
-
     num_rules = len(rules_list)
     
     if num_rules <= 3:
