@@ -2,35 +2,12 @@ import itertools
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 import numpy as np
+import typing
+from collections import defaultdict
+from cache import get_claims_sum
 
 
-def simulate_bankruptcy(N, E, rule_func):
-    """
-    Simulates the bankruptcy problem on N agents with E estate.
-    The simulation runs on all combinations of claims, where each claim is in 1..E,
-    and the sum of claims is strictly greater than E.
-    """
-    print(f"Starting simulation with N={N}, E={E}, Rule={rule_func.__name__}")
-    
-    # Generate unique combinations of claims on the agents (ignoring order)
-    # Each claim is in the range of 1 to E
-    claims_combinations = itertools.combinations_with_replacement(range(1, E + 1), N)
-    
-    results = []
-    
-    for claims in claims_combinations:
-        from cache import get_claims_sum
-        # Filter out cases where the total sum of claims is <= estate
-        if get_claims_sum(claims) <= E:
-            continue
-            
-        allocation = rule_func(E, list(claims))
-        results.append({
-            'claims': claims,
-            'allocation': allocation
-        })
-        
-    return results
+
 
 def plot_allocations(N, E, rules_list, simulate_func):
     """
@@ -67,7 +44,7 @@ def plot_allocations(N, E, rules_list, simulate_func):
             ax = fig.add_subplot(rows, cols, idx + 1, projection='3d')
             
         results = simulate_func(N, E, rule_func)
-        alloc_map = defaultdict(list)
+        alloc_map: typing.DefaultDict[typing.Tuple[int, int], typing.List[float]] = defaultdict(list)
         
         for res in results:
             claims = list(res['claims'])
@@ -138,7 +115,7 @@ def plot_gradients(N, E, rules_list, simulate_func):
             ax = fig.add_subplot(rows, cols, idx + 1, projection='3d')
             
         results = simulate_func(N, E, rule_func)
-        grad_map = defaultdict(list)
+        grad_map: typing.DefaultDict[typing.Tuple[int, int], typing.List[float]] = defaultdict(list)
         
         for res in results:
             claims = list(res['claims'])
@@ -209,7 +186,7 @@ def plot_gradients_heatmap(N, E, rules_list, simulate_func):
         ax = fig.add_subplot(rows, cols, idx + 1)
             
         results = simulate_func(N, E, rule_func)
-        grad_map = defaultdict(list)
+        grad_map: typing.DefaultDict[typing.Tuple[int, int], typing.List[float]] = defaultdict(list)
         
         for res in results:
             claims = list(res['claims'])
@@ -320,5 +297,83 @@ def plot_gradients_bar3d(N, E, rules_list, simulate_func):
         ax.set_title(f'{rule_func.__name__} ($\\Delta x_1$)')
 
     plt.suptitle(f'Agent 1 Gradient 3D Bar Plot (N={N}, E={E})')
+    plt.tight_layout()
+    plt.show()
+
+def plot_gradients_aggregated_heatmap(N, E, rules_list, simulate_func):
+    """
+    Plots the marginal gradient for Agent 1 as a heatmap for each rule.
+    X-axis: Agent 1's claim (c1)
+    Y-axis: Sum of all claims (C)
+    Color: Avg Marginal Gradient (Delta x_1)
+    """
+    import math
+    from collections import defaultdict
+    import typing
+    import numpy as np
+
+    num_rules = len(rules_list)
+    
+    if num_rules <= 3:
+        cols, rows = num_rules, 1
+    elif num_rules == 4:
+        cols, rows = 2, 2
+    elif num_rules <= 6:
+        cols, rows = 3, 2
+    elif num_rules <= 8:
+        cols, rows = 4, 2
+    else:
+        cols = math.ceil(math.sqrt(num_rules))
+        rows = math.ceil(num_rules / cols)
+    
+    fig = plt.figure(figsize=(6 * cols, 5 * rows))
+    
+    # Determine range of X (c1) and Y (C)
+    x_min, x_max = 1, E
+    y_min, y_max = N, N * E
+    
+    x_range = x_max - x_min + 1
+    y_range = y_max - y_min + 1
+
+    for idx, rule_func in enumerate(rules_list):
+        ax = fig.add_subplot(rows, cols, idx + 1)
+        
+        results = simulate_func(N, E, rule_func)
+        # Map (c1, sum_all) -> list of gradients
+        aggregated_data: typing.DefaultDict[typing.Tuple[int, int], typing.List[float]] = defaultdict(list)
+        
+        for res in results:
+            claims = list(res['claims'])
+            c1 = claims[0]
+            c_total = sum(claims)
+            
+            alloc_base = res['allocation'][0]
+            claims_plus = claims.copy()
+            claims_plus[0] += 1
+            
+            # Recalculate allocation for the gradient
+            alloc_plus = rule_func(E, claims_plus)[0]
+            grad = alloc_plus - alloc_base
+            
+            aggregated_data[(c1, c_total)].append(grad)
+
+        grid = np.full((y_range, x_range), np.nan)
+        
+        for (c1, c_total), grads in aggregated_data.items():
+            # Use average gradient for the pixel color
+            val = np.mean(grads)
+            # Grid indexing: y is rows (c_total), x is columns (c1)
+            grid[c_total - y_min, c1 - x_min] = val
+
+        im = ax.imshow(grid, origin='lower', 
+                       extent=[x_min - 0.5, x_max + 0.5, y_min - 0.5, y_max + 0.5],
+                       aspect='auto', cmap='RdYlGn_r', vmin=0, vmax=1)
+        
+        ax.set_title(f'{rule_func.__name__} (Avg $\\Delta x_1$)')
+        ax.set_xlabel('Agent 1 Claim ($c_1$)')
+        ax.set_ylabel('Sum of All Claims ($C$)')
+        fig.colorbar(im, ax=ax, label='Gradient Magnitude')
+
+    plt.suptitle(f'Agent 1 Gradient Aggregation Map (N={N}, E={E})')
     plt.tight_layout()
     plt.show()

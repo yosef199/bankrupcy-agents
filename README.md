@@ -59,9 +59,15 @@ Calculates $\Delta x_1 = f(E, c_1+1, \dots) - f(E, c_1, \dots)$.
 *   **Surface Plot ($N>2$)**: Averages the gradient over multiple claim configurations to show general trends.
 
 ### 3. 3D Bar Plots (The Discrete View)
-For $N \ge 3$, this plot maps the marginal gradient of Agent 1 against the claims of Agent 1 and Agent 2 ($c_2, c_3$).
+For $N = 3$, this plot maps the marginal gradient of Agent 1 against the claims of Agent 2 and Agent 3 ($c_2, c_3$).
 *   **Why Bars?**: Bankruptcy rules operate on discrete claims. Bar plots emphasize that these are not continuous functions, but step-wise allocations.
 *   **Color Coding**: Uses a `RdYlGn` colormap, where Green (1.0) indicates a full marginal gain and Red (0.0) indicates zero marginal gain for an extra unit of claim.
+
+### 4. Aggregated Gradient Heatmap (N > 3)
+For larger groups of agents, we plot a suite of 4 heatmaps (Average, Median, Max, Min):
+*   **X-axis**: $C_{-1}$ (the sum of claims of all agents *except* agent 1).
+*   **Y-axis**: $c_1$ (agent 1's claim).
+*   **Insight**: This allows us to see how agent 1's marginal gain fluctuates depending on the "total competition" from others, even when individual combinations are too numerous to plot.
 
 ---
 

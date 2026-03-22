@@ -1,7 +1,12 @@
 import itertools
 from rules import proportional_rule, cea_rule, cel_rule, talmud_rule, talmud_theta_rule
-from utils import plot_allocations, plot_gradients, plot_gradients_heatmap, plot_gradients_bar3d
-from cache import get_claims_sum
+from utils import (
+    plot_allocations, 
+    plot_gradients, 
+    plot_gradients_heatmap, 
+    plot_gradients_bar3d,
+    plot_gradients_aggregated_heatmap
+)
 from cache import get_claims_sum
 
 def simulate_bankruptcy(N, E, rule_func):
@@ -32,8 +37,8 @@ def simulate_bankruptcy(N, E, rule_func):
     return results
 
 if __name__ == "__main__":
-    # Example parameters
-    N = 8
+    # parameters
+    N = 3
     E = 20
     theta_steps = 4
     
@@ -65,6 +70,9 @@ if __name__ == "__main__":
     if (N==2):
         print("Plotting discrete Heatmap for Gradients...")
         plot_gradients_heatmap(N, E, rules_to_plot, simulate_bankruptcy)
-    else:
+    elif (N==3):
         print("Plotting 3D Bar Plot for Gradients...")
         plot_gradients_bar3d(N, E, rules_to_plot, simulate_bankruptcy)
+    else:
+        print(f"Plotting Aggregated Heatmap for N={N} agents...")
+        plot_gradients_aggregated_heatmap(N, E, rules_to_plot, simulate_bankruptcy)
