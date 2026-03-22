@@ -7,6 +7,23 @@ from collections import defaultdict
 from cache import get_claims_sum
 
 
+def parse_arguments():
+    import argparse
+    parser = argparse.ArgumentParser(description="Bankruptcy Rules Simulation")
+    parser.add_argument("-N", type=int, default=None, help="Number of agents (N)")
+    parser.add_argument("-E", type=int, default=None, help="Total estate to distribute (E). Defaults to N * AVG_CLAIM if not set.")
+    parser.add_argument("--avg_claim", type=int, default=None, help="Average claim cap for each agent.")
+    parser.add_argument("--theta_steps", type=int, default=None, help="Granularity of theta-Talmud rules")
+    
+    args = parser.parse_args()
+    
+    N = args.N if args.N is not None else 3
+    AVG_CLAIM = args.avg_claim if args.avg_claim is not None else 10
+    E = args.E if args.E is not None else N * AVG_CLAIM
+    theta_steps = args.theta_steps if args.theta_steps is not None else 4
+    
+    return N, E, theta_steps
+
 
 
 def plot_allocations(N, E, rules_list, simulate_func):

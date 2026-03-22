@@ -1,3 +1,4 @@
+import argparse
 import itertools
 from rules import proportional_rule, cea_rule, cel_rule, talmud_rule, talmud_theta_rule
 from utils import (
@@ -5,7 +6,8 @@ from utils import (
     plot_gradients, 
     plot_gradients_heatmap, 
     plot_gradients_bar3d,
-    plot_gradients_aggregated_heatmap
+    plot_gradients_aggregated_heatmap,
+    parse_arguments
 )
 from cache import get_claims_sum
 
@@ -37,11 +39,7 @@ def simulate_bankruptcy(N, E, rule_func):
     return results
 
 if __name__ == "__main__":
-    # parameters
-    N = 3
-    AVG_CLAIM = 10
-    E = N * AVG_CLAIM
-    theta_steps = 4
+    N, E, theta_steps = parse_arguments()
     
     # We load the rules implemented
     rules_to_plot = [proportional_rule]

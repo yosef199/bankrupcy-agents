@@ -81,11 +81,23 @@ pip install matplotlib numpy
 ```
 
 ### Execution
-Run the main simulation script:
+Run the main simulation script directly with default parameters ($N=3$, $AVG\_CLAIM=10$, $E=30$, $theta\_steps=4$):
 ```bash
 python main.py
 ```
-You can modify $N$, $E$, and the `rules_to_plot` list in `main.py` to explore different scenarios.
+
+You can now easily configure the simulation parameters via command-line arguments:
+```bash
+# Override N and theta steps (E dynamically becomes 4 * 10 = 40)
+python main.py -N 4 --theta_steps 8
+
+# Override N, and explicitly set a custom Estate size bypassing avg_claim calculation
+python main.py -N 5 -E 60
+
+# Check all available flag options
+python main.py --help
+```
+You can still modify the rules instantiated inside `rules_to_plot` directly in `main.py` to explore custom rule comparisons.
 
 ---
 
