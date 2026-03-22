@@ -39,7 +39,12 @@ def simulate_bankruptcy(N, E, rule_func):
     return results
 
 if __name__ == "__main__":
-    N, E, theta_steps = parse_arguments()
+    N, avg_claim, E, theta_steps = parse_arguments()
+
+    N = N if N is not None else 3
+    AVG_CLAIM = avg_claim if avg_claim is not None else 10
+    E = E if E is not None else N * AVG_CLAIM
+    theta_steps = theta_steps if theta_steps is not None else 4
     
     # We load the rules implemented
     rules_to_plot = [proportional_rule]

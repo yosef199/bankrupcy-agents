@@ -25,12 +25,7 @@ def parse_arguments():
     
     args = parser.parse_args()
     
-    N = args.N if args.N is not None else 3
-    AVG_CLAIM = args.avg_claim if args.avg_claim is not None else 10
-    E = args.E if args.E is not None else N * AVG_CLAIM
-    theta_steps = args.theta_steps if args.theta_steps is not None else 4
-    
-    return N, E, theta_steps
+    return args.N, args.avg_claim, args.E, args.theta_steps
 
 
 
