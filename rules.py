@@ -58,14 +58,20 @@ def cel_rule(E, claims):
     allocation = [claims[i] - loss_allocation[i] for i in range(n)]
     return allocation
 
+
 def talmud_theta_rule(E, claims, theta=0.5):
     """
     Theta-Talmud rule (generalization of Talmud rule).
     If E <= sum(theta * c), applies CEA up to theta * c.
-    If E > sum(theta * c), gives each agent their claim minus the CEA of the 
-    remaining loss up to (1 - theta) * c.
+    If E > sum(theta * c), it uses the duality of CEL and CEA 
+    to allocate the remaining claims minus the equal sharing of losses.
     """
     total_claim = get_claims_sum(claims)
+    
+    # Handle the edge case where the estate is large enough to cover all claims
+    if total_claim <= E:
+        return list(claims)
+        
     theta_claims = [c * theta for c in claims]
     
     total_theta_claims = sum(theta_claims)

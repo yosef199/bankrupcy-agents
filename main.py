@@ -42,13 +42,13 @@ def simulate_bankruptcy(N, E, rule_func):
 if __name__ == "__main__":
     N, avg_claim, E, theta_steps = parse_arguments()
 
-    N = N if N is not None else 3
-    AVG_CLAIM = avg_claim if avg_claim is not None else 10
+    N = N if N is not None else 2
+    AVG_CLAIM = avg_claim if avg_claim is not None else 30
     E = E if E is not None else N * AVG_CLAIM
-    theta_steps = theta_steps if theta_steps is not None else 4
+    theta_steps = theta_steps if theta_steps is not None else 3
     
     # We load the rules implemented
-    rules_to_plot = [proportional_rule]
+    rules_to_plot = [proportional_rule, talmud_rule]
     
     # Add 0/theta_steps to theta_steps/theta_steps talmud theta rules dynamically
     for i in range(0, theta_steps + 1):
@@ -60,7 +60,7 @@ if __name__ == "__main__":
         elif (i == theta_steps):
             rule.__name__ = f"CEA"
         elif (i == theta_steps/2):
-            rule.__name__ = f"Talmud"
+            continue
         else:
             rule.__name__ = f"Tal-theta {i}/{theta_steps}"
         rules_to_plot.append(rule)
