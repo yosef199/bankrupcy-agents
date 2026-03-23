@@ -7,6 +7,7 @@ from utils import (
     plot_gradients_heatmap, 
     plot_gradients_bar3d,
     plot_gradients_aggregated_heatmap,
+    plot_gradients_histogram,
     parse_arguments
 )
 from cache import get_claims_sum
@@ -80,3 +81,6 @@ if __name__ == "__main__":
     else:
         print(f"Plotting Aggregated Heatmap for N={N} agents...")
         plot_gradients_aggregated_heatmap(N, E, rules_to_plot, simulate_bankruptcy)
+    
+    print("Plotting Gradient Histogram...")
+    plot_gradients_histogram(N, E, rules_to_plot, simulate_bankruptcy)

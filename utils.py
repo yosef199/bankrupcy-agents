@@ -338,3 +338,34 @@ def plot_gradients_aggregated_heatmap(N, E, rules_list, simulate_func):
     plt.suptitle(f'Agent 1 Gradient Aggregation Map (N={N}, E={E})')
     plt.tight_layout()
     plt.show()
+
+def plot_gradients_histogram(N, E, rules_list, simulate_func):
+    """
+    Plots a histogram of the marginal gradient for Agent 1 for each rule.
+    X-axis: Marginal gradient value (0 to 1)
+    Y-axis: Frequency (how many claim combinations produced that gradient)
+    This allows easy comparison of the gradient distributions across rules.
+    """
+    fig, rows, cols = setup_plotting_grid(len(rules_list))
+    
+    for idx, rule_func in enumerate(rules_list):
+        ax = fig.add_subplot(rows, cols, idx + 1)
+            
+        results = simulate_func(N, E, rule_func)
+        gradients = []
+        
+        for res in results:
+            claims = list(res['claims'])
+            alloc_base = res['allocation'][0]
+            grad = get_marginal_gradient(E, claims, rule_func, alloc_base)
+            gradients.append(grad)
+
+        ax.hist(gradients, bins=50, range=(0, 1), color='steelblue', edgecolor='black', alpha=0.85)
+        ax.set_xlabel('Marginal Gradient $\\Delta x_1$')
+        ax.set_ylabel('Frequency')
+        ax.set_xlim(0, 1)
+        ax.set_title(f'{rule_func.__name__}')
+
+    plt.suptitle(f'Agent 1 Marginal Gradient Distribution (N={N}, E={E})')
+    plt.tight_layout()
+    plt.show()
