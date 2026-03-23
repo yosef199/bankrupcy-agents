@@ -9,6 +9,42 @@ from collections import defaultdict
 from cache import get_claims_sum
 
 
+def setup_plotting_grid(num_rules: int):
+    """
+    Calculates the optimal subplot grid layout for the number of rules and initializes the matplotlib figure.
+    Returns: fig, rows, cols
+    """
+    if num_rules <= 3:
+        cols, rows = num_rules, 1
+    elif num_rules == 4:
+        cols, rows = 2, 2
+    elif num_rules <= 6:
+        cols, rows = 3, 2
+    elif num_rules <= 8:
+        cols, rows = 4, 2
+    else:
+        cols = int(math.ceil(math.sqrt(num_rules)))
+        rows = int(math.ceil(num_rules / cols))
+    
+    fig = plt.figure(figsize=(6 * cols, 5 * rows))
+    return fig, rows, cols
+
+
+def get_marginal_gradient(E, claims, rule_func, alloc_base):
+    """
+    Calculates the marginal gradient for Agent 1.
+    If Agent 1's claim is already at the estate limit (E), the gradient is 0.
+    """
+    c1 = claims[0]
+    if c1 >= E:
+        return 0.0
+    
+    claims_plus = list(claims).copy()
+    claims_plus[0] += 1
+    alloc_plus = rule_func(E, claims_plus)[0]
+    return alloc_plus - alloc_base
+
+
 def parse_arguments():
     """
     Parses command-line arguments to configure the simulation.
@@ -39,21 +75,7 @@ def plot_allocations(N, E, rules_list, simulate_func):
         print("Error: Allocation surface plotting is only supported for N >= 2.")
         return
 
-    num_rules = len(rules_list)
-    
-    if num_rules <= 3:
-        cols, rows = num_rules, 1
-    elif num_rules == 4:
-        cols, rows = 2, 2
-    elif num_rules <= 6:
-        cols, rows = 3, 2
-    elif num_rules <= 8:
-        cols, rows = 4, 2
-    else:
-        cols = math.ceil(math.sqrt(num_rules))
-        rows = math.ceil(num_rules / cols)
-    
-    fig = plt.figure(figsize=(6 * cols, 5 * rows))
+    fig, rows, cols = setup_plotting_grid(len(rules_list))
     from collections import defaultdict
     
     for idx, rule_func in enumerate(rules_list):
@@ -109,22 +131,7 @@ def plot_gradients(N, E, rules_list, simulate_func):
         print("Error: Gradient surface plotting is only supported for N >= 2.")
         return
         
-    import math
-    num_rules = len(rules_list)
-    
-    if num_rules <= 3:
-        cols, rows = num_rules, 1
-    elif num_rules == 4:
-        cols, rows = 2, 2
-    elif num_rules <= 6:
-        cols, rows = 3, 2
-    elif num_rules <= 8:
-        cols, rows = 4, 2
-    else:
-        cols = math.ceil(math.sqrt(num_rules))
-        rows = math.ceil(num_rules / cols)
-    
-    fig = plt.figure(figsize=(6 * cols, 5 * rows))
+    fig, rows, cols = setup_plotting_grid(len(rules_list))
     from collections import defaultdict
     
     for idx, rule_func in enumerate(rules_list):
@@ -140,11 +147,7 @@ def plot_gradients(N, E, rules_list, simulate_func):
             claims = list(res['claims'])
             alloc_base = res['allocation'][0]
             
-            claims_plus = claims.copy()
-            claims_plus[0] += 1
-            
-            alloc_plus = rule_func(E, claims_plus)[0]
-            grad = alloc_plus - alloc_base
+            grad = get_marginal_gradient(E, claims, rule_func, alloc_base)
             
             c1 = claims[0]
             c2 = claims[1]
@@ -185,21 +188,7 @@ def plot_gradients_heatmap(N, E, rules_list, simulate_func):
     import math
     from collections import defaultdict
     
-    num_rules = len(rules_list)
-    
-    if num_rules <= 3:
-        cols, rows = num_rules, 1
-    elif num_rules == 4:
-        cols, rows = 2, 2
-    elif num_rules <= 6:
-        cols, rows = 3, 2
-    elif num_rules <= 8:
-        cols, rows = 4, 2
-    else:
-        cols = math.ceil(math.sqrt(num_rules))
-        rows = math.ceil(num_rules / cols)
-    
-    fig = plt.figure(figsize=(6 * cols, 5 * rows))
+    fig, rows, cols = setup_plotting_grid(len(rules_list))
     
     for idx, rule_func in enumerate(rules_list):
         ax = fig.add_subplot(rows, cols, idx + 1)
@@ -211,11 +200,7 @@ def plot_gradients_heatmap(N, E, rules_list, simulate_func):
             claims = list(res['claims'])
             alloc_base = res['allocation'][0]
             
-            claims_plus = claims.copy()
-            claims_plus[0] += 1
-            
-            alloc_plus = rule_func(E, claims_plus)[0]
-            grad = alloc_plus - alloc_base
+            grad = get_marginal_gradient(E, claims, rule_func, alloc_base)
             
             c1 = claims[0]
             c2 = claims[1]
@@ -249,21 +234,7 @@ def plot_gradients_bar3d(N, E, rules_list, simulate_func):
     import math
     from collections import defaultdict
     
-    num_rules = len(rules_list)
-    
-    if num_rules <= 3:
-        cols, rows = num_rules, 1
-    elif num_rules == 4:
-        cols, rows = 2, 2
-    elif num_rules <= 6:
-        cols, rows = 3, 2
-    elif num_rules <= 8:
-        cols, rows = 4, 2
-    else:
-        cols = math.ceil(math.sqrt(num_rules))
-        rows = math.ceil(num_rules / cols)
-    
-    fig = plt.figure(figsize=(6 * cols, 5 * rows))
+    fig, rows, cols = setup_plotting_grid(len(rules_list))
     
     for idx, rule_func in enumerate(rules_list):
         ax = fig.add_subplot(rows, cols, idx + 1, projection='3d')
@@ -275,11 +246,7 @@ def plot_gradients_bar3d(N, E, rules_list, simulate_func):
             claims = list(res['claims'])
             alloc_base = res['allocation'][0]
             
-            claims_plus = claims.copy()
-            claims_plus[0] += 1
-            
-            alloc_plus = rule_func(E, claims_plus)[0]
-            grad = alloc_plus - alloc_base
+            grad = get_marginal_gradient(E, claims, rule_func, alloc_base)
             
             c2 = claims[1]
             c3 = claims[2]
@@ -325,21 +292,7 @@ def plot_gradients_aggregated_heatmap(N, E, rules_list, simulate_func):
     Y-axis: Sum of all claims (C)
     Color: Avg Marginal Gradient (Delta x_1)
     """
-    num_rules = len(rules_list)
-    
-    if num_rules <= 3:
-        cols, rows = num_rules, 1
-    elif num_rules == 4:
-        cols, rows = 2, 2
-    elif num_rules <= 6:
-        cols, rows = 3, 2
-    elif num_rules <= 8:
-        cols, rows = 4, 2
-    else:
-        cols = math.ceil(math.sqrt(num_rules))
-        rows = math.ceil(num_rules / cols)
-    
-    fig = plt.figure(figsize=(6 * cols, 5 * rows))
+    fig, rows, cols = setup_plotting_grid(len(rules_list))
     
     # Determine range of X (c1) and Y (C)
     x_min, x_max = 1, E
@@ -361,12 +314,7 @@ def plot_gradients_aggregated_heatmap(N, E, rules_list, simulate_func):
             c_total = sum(claims)
             
             alloc_base = res['allocation'][0]
-            claims_plus = claims.copy()
-            claims_plus[0] += 1
-            
-            # Recalculate allocation for the gradient
-            alloc_plus = rule_func(E, claims_plus)[0]
-            grad = alloc_plus - alloc_base
+            grad = get_marginal_gradient(E, claims, rule_func, alloc_base)
             
             aggregated_data[(c1, c_total)].append(grad)
 
